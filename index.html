@@ -1,0 +1,330 @@
+<div class="post-body post-content">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<style> 
+table tr td{
+  border:1px solid #CCCCCC;border-width: 1px;padding:5px;
+}
+table input,table form,table textarea,table button {-webkit-appearance: auto;  -moz-appearance: auto; appearance: auto;}
+.accbutton{
+-moz-border-radius: 5px;
+border-radius: 5px;
+-webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+-moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+box-shadow: rgba(0,0,0,1) 0 1px 0;
+padding: 4px 7px;
+width: 170px;
+clear: none;
+display: block;
+text-decoration: none;
+margin: auto;
+height: 35px;
+line-height: 23px;
+text-align: center;
+font-weight: bold;
+cursor: pointer; 
+}
+</style>
+<table class="contentpaneopen" style="width:100%;border-spacing: 0;">
+<tbody>
+<tr>
+<td valign="top">
+<p style="padding: 5px;"><strong>Position size calculator</strong> free Forex tool that lets you to calculate the size of the position in units and lots to accurately manage your risks. It works with all major currency pairs and crosses. It requires the minimum input values, but allows you to tune it finely to your specific needs. All you need to do is to fill the form below and press the Calculate button:</p>
+<br/>
+<script type="text/javascript">// <![CDATA[
+calc_type=0;
+
+function change_calc(type)
+{
+	calc_type=type;
+	$("#extra_request").val("");
+	if (type==0) {$("#extra_request_text").html("Volume:"); $("#extra_request_text_res").html("Margin:");}else{$("#extra_request_text").html("Margin:"); $("#extra_request_text_res").html("Volume:");}
+}
+
+
+function CalcPV(){
+	
+	var currency = document.getElementById('currency');
+	var leverage = document.getElementById('leverage');
+	var pair = document.getElementById('pair');
+	var extra_request = document.getElementById('extra_request');
+
+	leverage.style.border= "2px inset";
+	extra_request.style.border= "2px inset";
+
+
+	if(!leverage.value){
+		document.getElementById("error").innerHTML = "Enter your account leverage, please.";
+		document.getElementById("error").style.display= "block";
+		leverage.style.border= "2px solid red";
+		return false;
+	}
+
+	else if(!extra_request.value){
+		if (calc_type==0) {document.getElementById("error").innerHTML = "Enter the volume size, please.";}
+		if (calc_type==0) {document.getElementById("error").innerHTML = "Enter the margin, please.";}
+		document.getElementById("error").style.display= "block";
+		extra_request.style.border= "2px solid red";
+		return false;
+	}
+
+    document.getElementById("error").style.display= "none";
+
+	$.get("https://static.hotforex.com/charts/livequotes/calculators_live_quotes.json", function(result) {
+		pair_bid=result;
+		volume_mult=1;
+		if (currency.value=="EUR") {volume_mult=1/pair_bid["EURUSD"];}
+		if (currency.value=="ZAR") {volume_mult=pair_bid["USDZAR"];}
+		if (currency.value=="NGN") {volume_mult=pair_bid["USDNGN"];}
+
+		calc_result=100000/leverage.value;
+		cur_price=0;
+		var margin_pairs = ["AUDUSD","USDCAD","USDCHF","EURUSD","GBPUSD","NZDUSD","USDZAR"];
+		if (pair.value.substring(0,3)=="USD") {cur_price=1;}
+		if (margin_pairs.indexOf("USD"+pair.value.substring(0,3))!=-1) {cur_price=pair_bid["USD"+pair.value.substring(0,3)];}
+		if (margin_pairs.indexOf(pair.value.substring(0,3)+"USD")!=-1) {cur_price=pair_bid[pair.value.substring(0,3)+"USD"];}
+		calc_result*=cur_price;
+		if (calc_type==0) {$("#result").val((calc_result*extra_request.value*volume_mult).toFixed(2));}else{$("#result").val((extra_request.value/calc_result/volume_mult).toFixed(2));}
+
+	});	
+	return true;
+}
+function GetURLParameter(sParam)
+{
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}
+(function() {
+	var refid = GetURLParameter('refid');
+	var reflink = document.getElementById('reflink');
+	if(refid != undefined){
+		reflink.setAttribute('href', 'https://hotforex.com/?refid='+refid+'');
+	}
+
+})();
+// ]]></script>
+<form id="f" style="padding: 5px;">
+<label id="error" style="border:2px solid red; display:none; font-size:12px;"></label>
+<table border="0" cellpadding="0" cellspacing="1" style="width: 100%;font-size: 13px;">
+<tbody>
+<tr>
+<td>Account Currency:</td>
+<td colspan="2">
+<select class="f2" id="currency" name="currency">
+<option value="USD">USD</option>
+<option value="EUR">EUR</option>
+<option value="ZAR">ZAR</option>
+<option value="NGN">NGN</option>
+</select>
+</td>
+</tr>
+<tr>
+<td>Account Leverage:</td>
+<td colspan="2">1:<input class="f3" id="leverage" name="leverage" style="width: 144px;" type="text" value="100"/></td>
+</tr>
+<tr>
+<td>Currency pair:</td>
+<td colspan="2"><select class="f2" id="pair" name="pair"><option value="EUR/USD">EUR/USD</option><option value="GBP/USD">GBP/USD</option><option value="USD/JPY">USD/JPY</option><option value="USD/CHF">USD/CHF</option><option value="USD/CAD">USD/CAD</option><option value="EUR/JPY">EUR/JPY</option><option value="GBP/JPY">GBP/JPY</option><option value="AUD/USD">AUD/USD</option><option value="NZD/USD">NZD/USD</option><option value="EUR/GBP">EUR/GBP</option><option value="EUR/CHF">EUR/CHF</option><option value="EUR/AUD">EUR/AUD</option><option value="EUR/CAD">EUR/CAD</option><option value="EUR/NZD">EUR/NZD</option><option value="GBP/CHF">GBP/CHF</option><option value="GBP/AUD">GBP/AUD</option><option value="GBP/CAD">GBP/CAD</option><option value="GBP/NZD">GBP/NZD</option><option value="AUD/CHF">AUD/CHF</option><option value="CAD/CHF">CAD/CHF</option><option value="CHF/JPY">CHF/JPY</option><option value="NZD/CHF">NZD/CHF</option><option value="AUD/CAD">AUD/CAD</option><option value="AUD/JPY">AUD/JPY</option><option value="AUD/NZD">AUD/NZD</option><option value="CAD/JPY">CAD/JPY</option><option value="NZD/CAD">NZD/CAD</option><option value="NZD/JPY">NZD/JPY</option><option value="USD/ZAR">USD/ZAR</option></select></td>
+</tr>
+<tr>
+<td align="center" colspan="2">
+<hr/>
+<table><tr><td>
+<input class="f2 accbutton" onclick="change_calc(0)" type="button" value="Calculate Margin"/>
+</td><td>
+<input class="f2 accbutton" onclick="change_calc(1)" type="button" value="Calculate Volume"/>
+</td></tr></table><br/><br/>
+</td>
+</tr>
+<tr>
+<td><div id="extra_request_text">Volume:</div></td>
+<td colspan="2"><input class="f3" id="extra_request" name="extra_request" style="width: 144px;" type="text"/></td>
+</tr>
+<tr>
+<td align="center" colspan="2">
+<input class="f2 accbutton" onclick="CalcPV();" type="button" value="Calculate"/>
+</td>
+</tr>
+<tr>
+<td colspan="2"><strong>Results:</strong></td>
+</tr>
+<tr>
+<td><div id="extra_request_text_res">Margin:</div></td>
+<td colspan="2"><input class="f2" id="result" name="result" type="text"/></td>
+</tr>
+</tbody>
+</table>
+<script type="text/javascript">// <![CDATA[
+var t = readCookie('earnforex_psc_currency');
+ var currency = document.getElementById('currency');
+ if (t != null) currency.value = t;
+ t = readCookie('earnforex_psc_leverage');
+ if (t != null) leverage.value = t;
+ ShowForm();
+// ]]></script>
+<p>Calculating the amount you can risk is very important if you carefully follow money management strategy. I advice using it every time you manually open a new Forex position. It will take a minute of your time, but it will also save you from losing money you dont want to lose. Position size calculation is also a first step to the organized Forex trading, which in its turn is definite property of the professional Forex trader.</p>
+<p>Importance of the thorough position size calculation is stressed out in many influent Forex books. Sizing a position should be done in line with setting the right stop-loss and take-profit levels. And its hard to lose all the accounts money if you manage risk and position size every time you enter the Forex market.</p>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+<script>
+//<![CDATA[
+document.addEventListener('DOMContentLoaded', function () {
+    // --- PART 1: Remove links to nonexistent anchors ---
+    const linkshDiv = document.querySelector('.linksh');
+    if (linkshDiv) {
+        const links = linkshDiv.querySelectorAll('a');
+        links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                const targetId = href.substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (!targetElement) {
+                    link.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // --- PART 2: Lazy-load YouTube iframe ---
+    const container = document.querySelector('.youtube-lazy');
+    if (!container) return;
+
+    const videoId = container.getAttribute('data-video-id');
+    const si = container.getAttribute('data-si');
+
+    function createIframe(src = null) {
+        if (container.querySelector("iframe")) return;
+
+        const iframe = document.createElement("iframe");
+        iframe.setAttribute("width", "560");
+        iframe.setAttribute("height", "315");
+        iframe.setAttribute("frameborder", "0");
+        iframe.setAttribute("allowfullscreen", "");
+        iframe.setAttribute("loading", "lazy");
+        iframe.setAttribute("title", "YouTube video player");
+        iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+        iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
+        iframe.setAttribute("name", "youtubeframe");
+        iframe.src = src || `https://www.youtube.com/embed/${videoId}?autoplay=1&si=${encodeURIComponent(si)}`;
+
+        container.innerHTML = "";
+        container.appendChild(iframe);
+    }
+
+    function scrollToIframeCenter() {
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // On thumbnail click
+    container.addEventListener("click", () => {
+        createIframe();
+        scrollToIframeCenter();
+    });
+
+    // On ▶️ link click
+    document.querySelectorAll('a[target="youtubeframe"]').forEach(link => {
+        link.addEventListener("click", (e) => {
+            const iframeExists = container.querySelector("iframe");
+            if (!iframeExists) {
+                e.preventDefault();
+                createIframe(link.href);
+                setTimeout(() => {
+                    window.open(link.href, "youtubeframe");
+                    scrollToIframeCenter();
+                }, 200);
+            } else {
+                scrollToIframeCenter();
+            }
+        });
+    });
+});
+//]]>
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Position Size Calculator",
+  "url": "https://www.robotfx.org/p/position-size-calculator.html",
+  "description": "Position size calculator  free Forex tool that lets you to calculate the size of the position in units and lots to accurately manage your risks. It works with all major currency &#8230;",
+  "operatingSystem": "MetaTrader 4, MetaTrader 5 (Windows, macOS, Linux with Wine/VM)",
+  "applicationCategory": "https://schema.org/FinanceApplication",
+  "applicationSuite": "MetaTrader",
+  
+    "screenshot": {
+      "@type": "ImageObject",
+      "url": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjp75CL5feBC7QYmLKNcIU4PU6_T5zv3w_qW7dPZ01x67l8enIpkXgNGhjTQ_91zTj9MaAaG2abP8_ccEUvxFlb8LAZ5b2s17mH9OO-y4qhShO7h2PfItjxXYU_eSQtI3M7G0qc2c22Sx_HWH9vvaqInwqmS-1IzeVauznK00gH2_oG85PsLRreoazmsXuh/s16000-e90/robotfx_forex_trading_tools.jpg"
+    },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "RobotFX Team",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://blogger.googleusercontent.com/img/a/AVvXsEjqDhYXLdZI2Hzi6vkQ2pnPz20A0rNyP3HTYoia8-RUD3170pCSfv77ACpX05KJt2iIgwDcm6N79AqUxzKoAFgIupT-XgEC9rzlwDH4hBMKDACgfLPjg2UaySbCEQUW9mZnMlHq_n0q4WC8juOoEAtodFyQcP_M0J9fxW3c3UUy6z7L9oYzcOgG-anlGA=s128-e365-rw"
+    }
+  },
+  "datePublished": "2023-03-01T09:58:00-08:00",
+  "dateModified": "2023-03-01T09:58:00-08:00",
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "price": "0",
+    "priceCurrency": "USD",
+    "url": "https://www.robotfx.org/p/position-size-calculator.html"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "reviewCount": "1"
+  },
+  "review": [
+    
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to use Position Size Calculator",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Functions",
+      "text": "Explore the core functions of the Position Size Calculator."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Charts",
+      "text": "Check the charts to see Position Size Calculator examples and understand how it works."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Settings",
+      "text": "Adjust the Position Size Calculator settings according to the instructions and your preferences."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Videos",
+      "text": "Watch tutorial videos for a better understanding of how Position Size Calculator works."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Download",
+      "text": "Download the Position Size Calculator and copy it in the MetaTrader folder."
+    }
+  ]
+}
+</script>
+</div>
